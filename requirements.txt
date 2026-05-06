@@ -1,6 +1,0 @@
-Flask
-pymongo
-python-dotenv
-opencv-python
-pytesseract
-dnspython
