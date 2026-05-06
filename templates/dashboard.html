@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Medicine Dashboard</title>
+
+<style>
+body{
+    font-family: Arial;
+    background:#f5f7fa;
+    margin:0;
+}
+
+.container{
+    width:95%;
+    margin:30px auto;
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.1);
+}
+
+h2{text-align:center;}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#6c63ff;
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:10px;
+    text-align:center;
+    border-bottom:1px solid #eee;
+}
+
+.badge{
+    padding:5px 10px;
+    border-radius:15px;
+    color:white;
+    font-size:12px;
+}
+
+.low{ background:#ff4d4d; }
+.medium{ background:#ffa500; }
+.ok{ background:#2ecc71; }
+
+.expiring{
+    background:#ffe6e6;
+}
+
+img{
+    border-radius:6px;
+}
+
+.btn{
+    padding:8px 12px;
+    border-radius:6px;
+    text-decoration:none;
+    color:white;
+}
+
+.delete{ background:#ff4d4d; }
+.back{ background:#2ecc71; }
+
+.alert-box{
+    position:fixed;
+    right:20px;
+    top:100px;
+    width:260px;
+    background:#ff4d4d;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+}
+
+#lowStockBar{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#ffc107;
+    padding:12px;
+    text-align:center;
+    font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Medicine Dashboard</h2>
+
+<table>
+<tr>
+<th>Name</th>
+<th>Stock</th>
+<th>Expiry</th>
+<th>Order</th>
+<th>Image</th>
+<th>Action</th>
+</tr>
+
+{% for med in medicines %}
+<tr class="{% if med.is_expiring %}expiring{% endif %}">
+
+<td>{{ med.medicine_name }}</td>
+
+<td>
+{% if med.stock <= 5 %}
+<span class="badge low">LOW</span>
+{% elif med.stock <= 15 %}
+<span class="badge medium">MED</span>
+{% else %}
+<span class="badge ok">OK</span>
+{% endif %}
+<br>{{ med.stock }}
+</td>
+
+<td>
+{{ med.expiry_date }}
+{% if med.days_left is not none %}
+<br><small style="color:red;">{{ med.days_left }} days</small>
+{% endif %}
+</td>
+
+<td>{{ med.order_date }}</td>
+
+<td>
+<img src="{{ url_for('static', filename='images/' + med.image) }}" width="40">
+</td>
+
+<td>
+<a href="/delete/{{ med._id }}" class="btn delete">Delete</a>
+</td>
+
+</tr>
+{% endfor %}
+</table>
+
+<a href="/upload_page" class="btn back">⬅ Back</a>
+
+</div>
+
+<!-- POPUP -->
+{% if popup_msg %}
+<div class="alert-box" id="popup">
+<b>Expiring Medicines</b><br><br>
+{{ popup_msg.replace('\n','<br>') | safe }}
+</div>
+
+<script>
+setTimeout(() => {
+    document.getElementById("popup").style.display = "none";
+}, 5000);
+</script>
+{% endif %}
+
+<!-- LOW STOCK -->
+{% if low_stock_msg %}
+<div id="lowStockBar">
+⚠️ Low Stock: {{ low_stock_msg }}
+</div>
+{% endif %}
+
+</body>
+</html>
